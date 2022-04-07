@@ -31,57 +31,59 @@
       </div>
     </div>
     <div id="unity-fullscreen-button" style="display: none;"></div>
-    <script>
-      const hideFullScreenButton = "true";
-      const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/Webgl.loader.js";
-      const config = {
-        dataUrl: buildUrl + "/Webgl.data",
-        frameworkUrl: buildUrl + "/Webgl.framework.js",
-        codeUrl: buildUrl + "/Webgl.wasm",
-        streamingAssetsUrl: "StreamingAssets",
-        companyName: "DefaultCompany",
-        productName: "KF3ScenarioViewer",
-        productVersion: "0.1",
-      };
+    <script>	
+		const hideFullScreenButton = "true";
+		const buildUrl = "Build";
+		const loaderUrl = buildUrl + "/Webgl.loader.js";
+		const config = {
+		dataUrl: buildUrl + "/Webgl.data",
+		frameworkUrl: buildUrl + "/Webgl.framework.js",
+		codeUrl: buildUrl + "/Webgl.wasm",
+		streamingAssetsUrl: "StreamingAssets",
+		companyName: "DefaultCompany",
+		productName: "KF3ScenarioViewer",
+		productVersion: "0.1",
+		};
 
-      const container = document.querySelector("#unity-container");
-      const canvas = document.querySelector("#unity-canvas");
-      const loadingCover = document.querySelector("#loading-cover");
-      const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
-      const progressBarFull = document.querySelector("#unity-progress-bar-full");
-      const fullscreenButton = document.querySelector("#unity-fullscreen-button");
-      const spinner = document.querySelector('.spinner');
+		const container = document.querySelector("#unity-container");
+		const canvas = document.querySelector("#unity-canvas");
+		const loadingCover = document.querySelector("#loading-cover");
+		const progressBarEmpty = document.querySelector("#unity-progress-bar-empty");
+		const progressBarFull = document.querySelector("#unity-progress-bar-full");
+		const fullscreenButton = document.querySelector("#unity-fullscreen-button");
+		const spinner = document.querySelector('.spinner');
+		var uInstance;
 
-      const canFullscreen = (function() {
-        for (const key of [
-            'exitFullscreen',
-            'webkitExitFullscreen',
-            'webkitCancelFullScreen',
-            'mozCancelFullScreen',
-            'msExitFullscreen',
-          ]) {
-          if (key in document) {
-            return true;
-          }
-        }
-        return false;
-      }());
+		const canFullscreen = (function() {
+		for (const key of [
+			'exitFullscreen',
+			'webkitExitFullscreen',
+			'webkitCancelFullScreen',
+			'mozCancelFullScreen',
+			'msExitFullscreen',
+		  ]) {
+		  if (key in document) {
+			return true;
+		  }
+		}
+		return false;
+		}());
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        container.className = "unity-mobile";
-        config.devicePixelRatio = 1;
-      }
-      loadingCover.style.display = "";
+		if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+		container.className = "unity-mobile";
+		config.devicePixelRatio = 1;
+		}
+		loadingCover.style.display = "";
 
-      const script = document.createElement("script");
-      script.src = loaderUrl;
-      script.onload = () => {
-        createUnityInstance(canvas, config, (progress) => {
-          spinner.style.display = "none";
-          progressBarEmpty.style.display = "";
-          progressBarFull.style.width = `${100 * progress}%`;
-        }).then((unityInstance) => {
+		const script = document.createElement("script");
+		script.src = loaderUrl;
+		script.onload = () => {
+		  createUnityInstance(canvas, config, (progress) => {
+		  spinner.style.display = "none";
+		  progressBarEmpty.style.display = "";
+		  progressBarFull.style.width = `${100 * progress}%`;
+		}).then((unityInstance) => {
+			uInstance = unityInstance;
 			const gameContainer = document.getElementById('unity-container');
 			gameContainer.addEventListener('dragover', (event) => {
 				event.preventDefault();
@@ -92,20 +94,27 @@
 				const first = files[0];
 				unityInstance.SendMessage("GameManager", "FileSelected", window.URL.createObjectURL(first), first);
 			});
-          loadingCover.style.display = "none";
-          if (canFullscreen) {
-            if (!hideFullScreenButton) {
-              fullscreenButton.style.display = "";
-            }
-            fullscreenButton.onclick = () => {
-              unityInstance.SetFullscreen(1);
-            };
-          }
-        }).catch((message) => {
-          alert(message);
-        });
-      };
-      document.body.appendChild(script);
+		  loadingCover.style.display = "none";
+		  if (canFullscreen) {
+			if (!hideFullScreenButton) {
+			  fullscreenButton.style.display = "";
+			}
+			fullscreenButton.onclick = () => {
+			  unityInstance.SetFullscreen(1);
+			};
+		  }
+		}).catch((message) => {
+		  alert(message);
+		});
+		};
+		document.body.appendChild(script);
+		
+		window.onbeforeunload = function() {
+			// These are the messages you're seeing in the gif
+			console.log("Calling OnClose from Browser!");
+			uInstance.SendMessage("GameManager", "OnClose");
+			return "alert";
+		};
     </script>
   </body>
 </html>
