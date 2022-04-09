@@ -1,3 +1,3 @@
 git add *
-git commit -m "Added a button for showing a guide on how the tool is used"
+git commit -m "Added an auto-translate button"
 git push origin master
