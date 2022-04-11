@@ -1,3 +1,3 @@
 git add *
-git commit -m "Added text export, changed how UI works internally"
+git commit -m "Fixed critical error with dropdowns"
 git push origin master
