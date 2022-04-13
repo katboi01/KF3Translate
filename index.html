@@ -92,7 +92,8 @@
 				event.preventDefault();
 				const files = event.dataTransfer.files;
 				const first = files[0];
-				unityInstance.SendMessage("GameManager", "FileSelected", window.URL.createObjectURL(first), first);
+				var json = JSON.stringify({"blob":URL.createObjectURL(first), "name":first.name});				
+				unityInstance.SendMessage("GameManager", "FileSelected", json);
 			});
 		  loadingCover.style.display = "none";
 		  if (canFullscreen) {
